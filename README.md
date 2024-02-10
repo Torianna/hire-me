@@ -75,3 +75,12 @@ curl \
   -d 'accessToken=<accessToken>' \
   https://app.famly.co/api/v2/children/fcd683d0-bc31-468c-948f-1ca70b91439d/checkout
 ```
+
+
+### Design and setup instructions
+```
+I opted for React with JavaScript for its simplicity, 
+ideal for my small application. For the design aspect, 
+I utilized MUI, a UI toolkit that enables rapid construction of aesthetically pleasing interfaces. 
+Additionally, I incorporated React Query to efficiently manage server-side state.
+```
