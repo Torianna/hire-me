@@ -1,33 +1,76 @@
 import {useChildren} from "../../Querries/useChildren";
 import {
     Avatar,
-    Button,
+    Button, IconButton,
     List,
     ListItemAvatar,
     ListItemButton,
     ListItemText,
-    Paper,
+    Paper, Snackbar,
     Typography
 } from "@mui/material";
 import dayjs from "dayjs";
 import {useChildrenMutations} from "../../Querries/useChildrenMutations";
 import {useState} from "react";
+import * as React from 'react';
 import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
 import Grid from '@mui/material/Unstable_Grid2'
 import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
 
 export const ChildrenList = () => {
     const {data} = useChildren();
     const [showCheckIn, setShowCheckIn] = useState(null)
     const {checkIn, checkOut} = useChildrenMutations();
-    console.log('showCheckIn', showCheckIn)
-    console.log('data', data)
+    const [open, setOpen] = useState(false);
+    const [snackBarMessage, setSnackBarMessage] =  useState('Child checked in');
+
+
+    const handleClick = () => {
+        setOpen(true);
+    };
+
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpen(false);
+    };
 
     const checkInYourChild = (id) => {
+        setSnackBarMessage('Child checked in')
         checkIn.mutate(id, {
-            onSuccess: ()=> setShowCheckIn(null)
+            onSuccess: ()=> {
+                setShowCheckIn(null);
+                handleClick()
+            }
         })
     }
+
+    const checkOutYourChild = (id) => {
+        setSnackBarMessage('Child checked out')
+        checkOut.mutate(id, {
+            onSuccess: ()=> {
+                setShowCheckIn(null);
+                handleClick()
+            }
+        })
+    }
+
+    const action = (
+        <React.Fragment>
+            <IconButton
+                size="small"
+                aria-label="close"
+                color="inherit"
+                onClick={handleClose}
+            >
+                <CloseIcon fontSize="small" />
+            </IconButton>
+        </React.Fragment>
+    );
 
     return (
         <Paper sx={{width: '100%', maxWidth: 500}}>
@@ -50,13 +93,24 @@ export const ChildrenList = () => {
                 </Grid>
                 {showCheckIn === child.childId &&
                 <Grid item xs={2} style={{alignSelf: 'center'}}>
-                    <Button variant="contained" onClick={()=>checkInYourChild(child.childId)} color="success" style={{width: '150px', margin: 0}} endIcon={<LoginIcon/>}>
+                    { child.checkedIn ?
+                        <Button variant="contained" onClick={()=>checkOutYourChild(child.childId)} color="error" style={{width: '150px', margin: 0}} endIcon={<LogoutIcon/>}>
+                            Check out
+                        </Button>
+                    :<Button variant="contained" onClick={()=>checkInYourChild(child.childId)} color="success" style={{width: '150px', margin: 0}} endIcon={<LoginIcon/>}>
                         Check in
-                    </Button>
+                    </Button>}
                 </Grid>}
             </Grid>
                 )}
             </List>
+            <Snackbar
+                open={open}
+                autoHideDuration={6000}
+                onClose={handleClose}
+                message={snackBarMessage}
+                action={action}
+            />
         </Paper>
     )
 }

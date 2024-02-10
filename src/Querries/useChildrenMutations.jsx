@@ -23,7 +23,8 @@ export const useChildrenMutations = () => {
                 method: "POST"
             });
             return await response.json();
-        } })
+        },
+        onSuccess: () => queryClient.invalidateQueries({queryKey: ['childrenList']})})
 
     return {
         checkIn,
